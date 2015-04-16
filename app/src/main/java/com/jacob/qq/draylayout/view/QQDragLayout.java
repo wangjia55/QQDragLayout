@@ -4,18 +4,18 @@ import android.content.Context;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.ViewDragHelper;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.RelativeLayout;
 
 import com.jacob.qq.draylayout.R;
+import com.nineoldandroids.view.ViewHelper;
 
 /**
  * Created by jacob-wj on 2015/4/16.
  */
 public class QQDragLayout extends RelativeLayout {
-    public static final int AUTO_MIN_SETTLE_SPEED = 800;
+    public static final int AUTO_MIN_SETTLE_SPEED = 1000;
 
     private ViewDragHelper mViewDragHelper;
 
@@ -47,8 +47,7 @@ public class QQDragLayout extends RelativeLayout {
 
     enum State {
         open,
-        close,
-        drag
+        close
     }
 
 
@@ -71,7 +70,7 @@ public class QQDragLayout extends RelativeLayout {
         @Override
         public void onViewPositionChanged(View changedView, int left, int top, int dx, int dy) {
             mDragLeftBorder = left;
-            super.onViewPositionChanged(changedView, left, top, dx, dy);
+            animateView(left);
         }
 
         @Override
@@ -94,7 +93,6 @@ public class QQDragLayout extends RelativeLayout {
 
         @Override
         public void onViewReleased(View releasedChild, float xvel, float yvel) {
-            Log.e("TAG","xvel:"+xvel+"+++yvel:"+yvel);
             if (mDragLeftBorder == 0){
                 mState = State.close;
                 return;
@@ -118,18 +116,31 @@ public class QQDragLayout extends RelativeLayout {
             }
 
             int destX = settleToOpen? checkRange:0;
-
             if (mViewDragHelper.settleCapturedViewAt(destX,0)){
                 ViewCompat.postInvalidateOnAnimation(QQDragLayout.this);
             }
-
-
         }
 
         @Override
         public void onViewDragStateChanged(int state) {
             super.onViewDragStateChanged(state);
         }
+    }
+
+    private void animateView(int left) {
+        float percent = left*1f/mDragRange;
+
+        float scaleMain = 1-percent*0.3f;
+        ViewHelper.setScaleX(mRelativeMain,scaleMain);
+        ViewHelper.setScaleY(mRelativeMain,scaleMain);
+        ViewHelper.setPivotX(mRelativeMain,0);
+        ViewHelper.setPivotY(mRelativeMain,mRelativeMain.getMeasuredHeight()/2);
+
+        float scaleMenu = 0.5f+percent*0.5f;
+        ViewHelper.setScaleX(mRelativeMenu,scaleMenu);
+        ViewHelper.setScaleY(mRelativeMenu,scaleMenu);
+        ViewHelper.setAlpha(mRelativeMenu,percent);
+        ViewHelper.setTranslationX(mRelativeMenu,(percent-1)*mRelativeMenu.getMeasuredWidth()/2f);
     }
 
     @Override
@@ -164,4 +175,27 @@ public class QQDragLayout extends RelativeLayout {
         mViewDragHelper.processTouchEvent(event);
         return true;
     }
+
+    public void open(){
+        if (mViewDragHelper.smoothSlideViewTo(mRelativeMain,mDragRange,0)){
+            ViewCompat.postInvalidateOnAnimation(QQDragLayout.this);
+        }
+        mState = State.open;
+    }
+
+    public void close(){
+        if (mViewDragHelper.smoothSlideViewTo(mRelativeMain,0,0)){
+            ViewCompat.postInvalidateOnAnimation(QQDragLayout.this);
+        }
+        mState = State.close;
+    }
+
+    public void toggle(){
+        if (mState == State.open){
+            close();
+        }else{
+            open();
+        }
+    }
+
 }

@@ -3,12 +3,12 @@ package com.jacob.qq.draylayout.bean;
 /**
  * Created by jacob-wj on 2015/4/16.
  */
-public class MenuItem {
+public class ListItemBean {
     private int icon;
 
     private String title;
 
-    public MenuItem(int icon, String title) {
+    public ListItemBean(int icon, String title) {
         this.icon = icon;
         this.title = title;
     }

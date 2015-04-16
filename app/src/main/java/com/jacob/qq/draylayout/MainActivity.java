@@ -1,8 +1,8 @@
 package com.jacob.qq.draylayout;
 
-import android.support.v4.app.FragmentActivity;
+import android.graphics.Color;
 import android.os.Bundle;
-import android.util.Log;
+import android.support.v4.app.FragmentActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,42 +11,70 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.jacob.qq.draylayout.bean.MenuItem;
+import com.jacob.qq.draylayout.bean.ListItemBean;
+import com.jacob.qq.draylayout.view.QQDragLayout;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 
 public class MainActivity extends FragmentActivity {
+    private QQDragLayout mDragLayout;
     private ListView mListMenu;
+    private ListView mListMain;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        mDragLayout = (QQDragLayout) findViewById(R.id.drag_layout);
         setupMenuList();
+        setupMainList();
+
+        ImageView imageView = (ImageView) findViewById(R.id.image_view_avatar);
+        imageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mDragLayout.toggle();
+            }
+        });
+    }
+
+    private void setupMainList() {
+        mListMain = (ListView) findViewById(R.id.list_view_user);
+        List<ListItemBean> mainList= new ArrayList<>();
+        for (int i = 0; i < 3; i++) {
+            mainList.add(new ListItemBean(R.drawable.pic5,"Hello Android ViewDragHelper"));
+            mainList.add(new ListItemBean(R.drawable.pic2,"Hello Android ViewDragHelper"));
+            mainList.add(new ListItemBean(R.drawable.pic3,"Hello Android ViewDragHelper"));
+            mainList.add(new ListItemBean(R.drawable.pic4,"Hello Android ViewDragHelper"));
+        }
+        LeftMenuAdapter adapter = new LeftMenuAdapter(mainList,1);
+        mListMain.setAdapter(adapter);
     }
 
     private void setupMenuList() {
         mListMenu = (ListView) findViewById(R.id.list_view_left_menu);
-        List<MenuItem> menuItemList = Arrays.asList(
-                new MenuItem(R.drawable.ic_item_1, "开通会员"),
-                new MenuItem(R.drawable.ic_item_2, "QQ钱包"),
-                new MenuItem(R.drawable.ic_item_9, "我的相册"),
-                new MenuItem(R.drawable.ic_item_13, "我的装扮"));
-        LeftMenuAdapter adapter = new LeftMenuAdapter(menuItemList);
+        List<ListItemBean> menuItemList = Arrays.asList(
+                new ListItemBean(R.drawable.ic_item_1, "开通会员"),
+                new ListItemBean(R.drawable.ic_item_2, "QQ钱包"),
+                new ListItemBean(R.drawable.ic_item_9, "我的相册"),
+                new ListItemBean(R.drawable.ic_item_13, "我的装扮"));
+        LeftMenuAdapter adapter = new LeftMenuAdapter(menuItemList,2);
         mListMenu.setAdapter(adapter);
     }
 
 
     private class LeftMenuAdapter extends BaseAdapter {
 
-        List<MenuItem> menuItemList;
+        List<ListItemBean> menuItemList;
         LayoutInflater layoutInflater;
-        private LeftMenuAdapter(List<MenuItem> menuItemList) {
+        int type ;
+        private LeftMenuAdapter(List<ListItemBean> menuItemList,int type) {
             this.menuItemList = menuItemList;
             layoutInflater = LayoutInflater.from(MainActivity.this);
+            this.type = type;
         }
 
         @Override
@@ -55,7 +83,7 @@ public class MainActivity extends FragmentActivity {
         }
 
         @Override
-        public MenuItem getItem(int position) {
+        public ListItemBean getItem(int position) {
             return menuItemList.get(position);
         }
 
@@ -72,14 +100,19 @@ public class MainActivity extends FragmentActivity {
                 convertView = layoutInflater.inflate(R.layout.layout_menu_item, parent,false);
                 viewHolder.imageView = (ImageView) convertView.findViewById(R.id.imageView_menu);
                 viewHolder.textView = (TextView) convertView.findViewById(R.id.textView_menu);
+                if (type == 1){
+                    viewHolder.textView.setTextColor(Color.parseColor("#FF595959"));
+                }else{
+                    viewHolder.textView.setTextColor(Color.parseColor("#FFFFFF"));
+                }
                 convertView.setTag(viewHolder);
             } else {
                 viewHolder = (ViewHolder) convertView.getTag();
             }
 
-            MenuItem menuItem = getItem(position);
-            Log.e("TAG", menuItem.toString());
+            ListItemBean menuItem = getItem(position);
             viewHolder.imageView.setImageResource(menuItem.getIcon());
+
             viewHolder.textView.setText(menuItem.getTitle());
             return convertView;
         }

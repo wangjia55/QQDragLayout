@@ -3,13 +3,14 @@
     android:orientation="horizontal"
     android:layout_width="match_parent"
     android:gravity="center_vertical"
-    android:layout_height="60dp">
+    android:layout_height="70dp">
 
     <ImageView
         android:id="@+id/imageView_menu"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="55dp"
+        android:layout_height="55dp"
         android:layout_marginLeft="15dp"
+        android:scaleType="center"
         android:src="@drawable/ic_item_1"/>
 
     <TextView
@@ -17,7 +18,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="15dp"
-        android:textColor="#ffffff"
+        android:textColor="#ffffffff"
         android:textSize="17sp"
         android:text="開通會員"/>
 </LinearLayout>
